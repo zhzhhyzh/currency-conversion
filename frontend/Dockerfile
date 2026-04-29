@@ -2,9 +2,6 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=$REACT_APP_API_URL
-
 # Copy package files
 COPY package*.json ./
 
@@ -33,6 +30,6 @@ COPY --from=builder /app/build ./build
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+    CMD node -e "require('http').get({host: 'localhost', port: process.env.PORT || 3000, path: '/'}, (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)}).on('error', () => process.exit(1))"
 
-CMD ["sh", "-c", "serve -s build -l ${PORT:-3000}"]
+CMD ["sh", "-c", "node -e \"const fs=require('fs'); fs.writeFileSync('build/env.js', 'window.__ENV__ = '+JSON.stringify({REACT_APP_API_URL: process.env.REACT_APP_API_URL || 'http://localhost:8081/api'})+';\\n')\" && serve -s build -l ${PORT:-3000}"]

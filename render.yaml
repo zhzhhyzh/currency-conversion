@@ -1,43 +1,36 @@
 services:
-  # 1. Redis
-  - type: redis
+  - type: keyvalue
     name: currency-redis
     plan: free
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
 
-  # 2. Backend
   - type: web
     name: currency-api
-    # FIX: Changed 'runtime' to 'env' for Docker services
-    env: docker
-    # rootDir changes the 'starting point' to the backend folder
-    rootDir: backend
-    # Relative to rootDir (so this looks for backend/Dockerfile)
-    dockerfilePath: Dockerfile 
-    # Relative to rootDir (so this uses the backend folder as context)
-    dockerContext: .
+    runtime: docker
     plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
     envVars:
-      - key: REDIS_HOST
-        value: currency-redis
-      - key: REDIS_PORT
-        value: "6379"
       - key: OPENEXCHANGERATES_API_KEY
         sync: false
+      - key: REDIS_ENABLED
+        value: "true"
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: currency-redis
+          property: connectionString
+      - key: EXCHANGE_RATES_SCHEDULE_ENABLED
+        value: "false"
 
-  # 3. Frontend
   - type: web
     name: currency-frontend
-    env: docker
-    rootDir: frontend
-    dockerfilePath: Dockerfile
-    dockerContext: .
+    runtime: docker
     plan: free
-    dockerBuildArgs:
-      - arg: REACT_APP_API_URL
-        fromService:
-          type: web
-          name: currency-api
-          property: host
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
     envVars:
-      - key: PORT
-        value: "3000"
+      - key: REACT_APP_API_URL
+        value: https://currency-api.onrender.com/api

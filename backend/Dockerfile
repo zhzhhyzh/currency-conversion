@@ -18,4 +18,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 COPY --from=builder /app/target/*.jar currency-api.jar
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-Dserver.port=${PORT:-8080}", "-jar", "currency-api.jar"]
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar currency-api.jar"]

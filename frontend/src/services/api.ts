@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { ConversionResponse, ExchangeRatesResponse } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = window.__ENV__?.REACT_APP_API_URL || process.env.REACT_APP_API_URL || 'http://localhost:8081/api';
 
 class CurrencyApi {
   private api: AxiosInstance;
