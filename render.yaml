@@ -10,14 +10,14 @@ services:
     name: currency-api
     env: docker
     dockerContext: ./backend
-    dockerfilePath: Dockerfile
+    # CHANGED: Path is relative to the context (./backend)
+    dockerfilePath: Dockerfile 
     plan: free
     envVars:
       - key: OPENEXCHANGERATES_API_KEY
         sync: false
       - key: REDIS_ENABLED
         value: "true"
-      # Using the standard internal naming convention
       - key: REDIS_HOST
         value: currency-redis
       - key: REDIS_PORT
@@ -28,7 +28,8 @@ services:
     name: currency-frontend
     env: docker
     dockerContext: ./frontend
-    dockerfilePath: Dockerfile
+    # CHANGED: Path is relative to the context (./frontend)
+    dockerfilePath: Dockerfile 
     plan: free
     envVars:
       - key: REACT_APP_API_URL
