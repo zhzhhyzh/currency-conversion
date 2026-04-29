@@ -5,7 +5,7 @@ Full-stack currency converter using Spring Boot, React, TypeScript, Redis, Docke
 ## Features
 
 - `GET /api/convert?from=USD&to=EUR&amount=100`
-- `GET /api/rates`
+- `GET /api/rates` refreshes latest rates from Open Exchange Rates and updates Redis
 - Local conversion calculation because the Open Exchange Rates `/convert` endpoint is restricted on the free plan
 - Redis cache for latest rates, expiring at the next GMT+8 currency cutoff
 - Demand-driven API usage: first conversion fills Redis, later conversions read cached rates
@@ -16,9 +16,6 @@ Full-stack currency converter using Spring Boot, React, TypeScript, Redis, Docke
 
 ## Requirements
 
-- Java 8 / 1.8+ for backend compilation
-- Node.js 22 preferred for frontend/Docker, Node 20 also worked locally for build verification
-- npm
 - Docker and Docker Compose
 - Free Open Exchange Rates API key from [openexchangerates.org](https://openexchangerates.org/signup/free)
 
@@ -30,14 +27,6 @@ Create a root `.env` file for Docker Compose:
 OPENEXCHANGERATES_API_KEY=your_api_key_here
 ```
 
-For local backend runs, configure either:
-
-```powershell
-$env:OPENEXCHANGERATES_API_KEY='your_api_key_here'
-```
-
-or update `backend/src/main/resources/application.properties`.
-
 Redis defaults:
 
 ```properties
@@ -47,41 +36,24 @@ redis.enabled=true
 exchange-rates.schedule.enabled=false
 ```
 
-Frontend API URL:
-
-```env
-REACT_APP_API_URL=http://localhost:8080/api
-```
+Docker Compose builds the frontend with `REACT_APP_API_URL=http://localhost:8081/api`.
 
 ## Run With Docker
 
 ```bash
-docker-compose up --build
+docker compose up -d --build
 ```
 
 URLs:
 
 - Frontend: `http://localhost:3000`
-- Backend: `http://localhost:8080/api`
+- Backend: `http://localhost:8081/api`
 - Redis: `localhost:6379`
 
-## Run Locally
-
-Backend:
+Stop the stack:
 
 ```bash
-cd backend
-mvn test
-mvn package
-mvn spring-boot:run
-```
-
-Frontend:
-
-```bash
-cd frontend
-npm install
-npm start
+docker compose down
 ```
 
 ## API Examples
@@ -89,7 +61,7 @@ npm start
 Convert currency:
 
 ```bash
-curl "http://localhost:8080/api/convert?from=USD&to=EUR&amount=100"
+curl "http://localhost:8081/api/convert?from=USD&to=EUR&amount=100"
 ```
 
 Example response:
@@ -105,22 +77,22 @@ Example response:
 }
 ```
 
-Get all latest rates:
+Refresh cache from Open Exchange Rates and return all latest rates:
 
 ```bash
-curl "http://localhost:8080/api/rates"
+curl "http://localhost:8081/api/rates"
 ```
 
 Health check:
 
 ```bash
-curl "http://localhost:8080/api/health"
+curl "http://localhost:8081/api/health"
 ```
 
 Cache status:
 
 ```bash
-curl "http://localhost:8080/api/cache/status"
+curl "http://localhost:8081/api/cache/status"
 ```
 
 ## Redis Cutoff Cache
@@ -128,6 +100,8 @@ curl "http://localhost:8080/api/cache/status"
 Open Exchange Rates returns USD-based rates for all currencies. The backend stores the fetched rate payload in Redis and calculates a TTL to expire at the nearest next cutoff time in GMT+8 among the supported currencies.
 
 The backend checks Redis first for every conversion. If Redis contains `exchange_rates:exchange_rates_usd`, no Open Exchange Rates request is made. If Redis misses, the backend fetches `latest.json`, stores it in Redis, and calculates the conversion locally.
+
+Calling `/api/rates` always fetches the latest payload from Open Exchange Rates and refreshes both Redis and the in-memory fallback cache.
 
 Cutoff table:
 

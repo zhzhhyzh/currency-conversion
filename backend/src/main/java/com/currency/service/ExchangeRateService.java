@@ -76,7 +76,15 @@ public class ExchangeRateService {
             return cachedData;
         }
 
-        log.info("Fetching fresh exchange rates from API");
+        return fetchLatestRatesFromApiAndRefreshCache(cacheKey);
+    }
+
+    public ExchangeRateData refreshLatestRates() {
+        return fetchLatestRatesFromApiAndRefreshCache("exchange_rates_usd");
+    }
+
+    private ExchangeRateData fetchLatestRatesFromApiAndRefreshCache(String cacheKey) {
+        log.info("Fetching fresh exchange rates from Open Exchange Rates API");
         try {
             String url = apiUrl + "?app_id=" + apiKey;
             String response = restTemplate.getForObject(url, String.class);
@@ -89,11 +97,11 @@ public class ExchangeRateService {
             long ttl = cutoffTimeManager.getCacheTTL(data.getRates().keySet());
             data.setCacheExpiryTime(System.currentTimeMillis() + (Math.max(ttl, 60) * 1000));
             
-            // Cache in both Redis and memory
+            // Refresh both Redis and memory cache with the official latest rates.
             if (redisEnabled) {
                 try {
                     if (redisCacheService.set(cacheKey, data, ttl)) {
-                        log.info("Stored latest exchange rates in Redis with TTL: {} seconds", ttl);
+                        log.info("Refreshed latest exchange rates in Redis with TTL: {} seconds", ttl);
                     }
                 } catch (Exception e) {
                     log.warn("Failed to cache in Redis: ", e);
@@ -165,7 +173,7 @@ public class ExchangeRateService {
     }
 
     public ExchangeRatesResponseDto getExchangeRates() {
-        ExchangeRateData data = getLatestRates();
+        ExchangeRateData data = refreshLatestRates();
         return new ExchangeRatesResponseDto(
             data.getBase(),
             data.getRates(),
