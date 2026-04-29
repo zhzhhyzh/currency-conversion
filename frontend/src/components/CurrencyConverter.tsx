@@ -1,39 +1,38 @@
 import React, { useEffect, useRef, useState } from 'react';
-import FlagIcon from './FlagIcon';
+import CurrencySearchSelect from './CurrencySearchSelect';
 import { ConversionResponse } from '../types';
+import { CURRENCY_OPTIONS, DEFAULT_FROM_CURRENCY_ID, DEFAULT_TO_CURRENCY_ID } from '../data/currencies';
 import api from '../services/api';
 import './CurrencyConverter.css';
 
-const POPULAR_CURRENCIES = [
-  'AED', 'AUD', 'BDT', 'BND', 'CAD', 'CHF', 'CNY', 'DKK',
-  'EUR', 'GBP', 'HKD', 'IDR', 'INR', 'JPY', 'LKR', 'NOK',
-  'NZD', 'PHP', 'PKR', 'SAR', 'SEK', 'SGD', 'THB', 'USD',
-  'ZAR'
-];
+const getCurrencyOption = (optionId: string) => (
+  CURRENCY_OPTIONS.find((option) => option.id === optionId) || CURRENCY_OPTIONS[0]
+);
+
+const currentYear = new Date().getFullYear();
 
 export const CurrencyConverter: React.FC = () => {
-  const [fromCurrency, setFromCurrency] = useState('USD');
-  const [toCurrency, setToCurrency] = useState('EUR');
+  const [fromCurrencyId, setFromCurrencyId] = useState(DEFAULT_FROM_CURRENCY_ID);
+  const [toCurrencyId, setToCurrencyId] = useState(DEFAULT_TO_CURRENCY_ID);
   const [amount, setAmount] = useState('100');
   const [result, setResult] = useState<ConversionResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const latestRequestId = useRef(0);
+  const fromCurrency = getCurrencyOption(fromCurrencyId);
+  const toCurrency = getCurrencyOption(toCurrencyId);
 
   useEffect(() => {
     const parsedAmount = Number(amount);
 
     if (!amount.trim()) {
       setResult(null);
-      setExchangeRate(null);
       setError(null);
       return;
     }
 
-    if (!fromCurrency || !toCurrency || !Number.isFinite(parsedAmount) || parsedAmount < 0) {
+    if (!fromCurrency.currencyCode || !toCurrency.currencyCode || !Number.isFinite(parsedAmount) || parsedAmount < 0) {
       setResult(null);
-      setExchangeRate(null);
       setError('Please enter a valid non-negative amount');
       return;
     }
@@ -45,16 +44,14 @@ export const CurrencyConverter: React.FC = () => {
 
     const timeoutId = window.setTimeout(async () => {
       try {
-        const response = await api.convert(fromCurrency, toCurrency, parsedAmount);
+        const response = await api.convert(fromCurrency.currencyCode, toCurrency.currencyCode, parsedAmount);
         if (latestRequestId.current === requestId) {
           setResult(response);
-          setExchangeRate(response.rate);
         }
       } catch (err) {
         if (latestRequestId.current === requestId) {
           setError(err instanceof Error ? err.message : 'An error occurred during conversion');
           setResult(null);
-          setExchangeRate(null);
         }
       } finally {
         if (latestRequestId.current === requestId) {
@@ -66,113 +63,90 @@ export const CurrencyConverter: React.FC = () => {
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [amount, fromCurrency, toCurrency]);
+  }, [amount, fromCurrency.currencyCode, toCurrency.currencyCode]);
 
   const handleSwapCurrencies = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
+    setFromCurrencyId(toCurrencyId);
+    setToCurrencyId(fromCurrencyId);
   };
 
   return (
     <div className="converter-container">
-      <div className="converter-card">
+      <header className="converter-header">
         <h1 className="converter-title">Currency Converter</h1>
-        
+        <p className="converter-subtitle">
+          Check live rates, set rate alerts, receive notifications and more.
+        </p>
+      </header>
+
+      <div className="converter-card">
         {error && <div className="error-message">{error}</div>}
 
-        <div className="converter-form">
-          {/* From Currency */}
-          <div className="currency-input-group">
-            <label htmlFor="from-currency" className="input-label">
-              From
-            </label>
-            <div className="currency-selector">
-              <FlagIcon countryCode={fromCurrency} size="md" className="flag-icon" />
-              <select
+        <div className="converter-panel">
+          <div className="conversion-row">
+            <p className="row-label">Amount</p>
+            <div className="row-body">
+              <CurrencySearchSelect
                 id="from-currency"
-                value={fromCurrency}
-                onChange={(e) => setFromCurrency(e.target.value)}
-                className="currency-select"
-              >
-                {POPULAR_CURRENCIES.map((curr) => (
-                  <option key={curr} value={curr}>
-                    {curr}
-                  </option>
-                ))}
-              </select>
+                selectedId={fromCurrencyId}
+                onChange={setFromCurrencyId}
+              />
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="amount-input"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
             </div>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="amount-input"
-              placeholder="Enter amount"
-              min="0"
-              step="0.01"
-            />
           </div>
 
-          {/* Swap Button */}
-          <button
-            onClick={handleSwapCurrencies}
-            className="swap-button"
-            title="Swap currencies"
-            disabled={loading}
-          >
-            Swap
-          </button>
+          <div className="swap-divider">
+            <span className="divider-line" />
+            <button
+              onClick={handleSwapCurrencies}
+              className="swap-button"
+              title="Swap currencies"
+              disabled={loading}
+              aria-label="Swap currencies"
+            >
+              <span className="swap-icon" aria-hidden="true" />
+            </button>
+            <span className="divider-line" />
+          </div>
 
-          {/* To Currency */}
-          <div className="currency-input-group">
-            <label htmlFor="to-currency" className="input-label">
-              To
-            </label>
-            <div className="currency-selector">
-              <FlagIcon countryCode={toCurrency} size="md" className="flag-icon" />
-              <select
+          <div className="conversion-row">
+            <p className="row-label">Converted Amount</p>
+            <div className="row-body">
+              <CurrencySearchSelect
                 id="to-currency"
-                value={toCurrency}
-                onChange={(e) => setToCurrency(e.target.value)}
-                className="currency-select"
-              >
-                {POPULAR_CURRENCIES.map((curr) => (
-                  <option key={curr} value={curr}>
-                    {curr}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {result && (
+                selectedId={toCurrencyId}
+                onChange={setToCurrencyId}
+              />
               <div className="result-display">
-                {result.convertedAmount.toFixed(2)}
+                {result ? result.convertedAmount.toFixed(2) : '0.00'}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
         {loading && <div className="loading-message">Updating conversion...</div>}
-
-        {/* Result */}
-        {result && !error && (
-          <div className="result-section">
-            <div className="result-info">
-              <p className="result-rate">
-                1 {fromCurrency} = {exchangeRate?.toFixed(6)} {toCurrency}
-              </p>
-              <p className="result-conversion">
-                <span className="amount">{result.amount}</span>
-                <span className="currency">{result.from}</span>
-                <span className="equals">=</span>
-                <span className="amount">{result.convertedAmount.toFixed(2)}</span>
-                <span className="currency">{result.to}</span>
-              </p>
-              <p className="result-timestamp">
-                Updated: {new Date(result.timestamp).toLocaleTimeString()}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
+
+      <section className="indicative-rate">
+        <p className="indicative-label">Indicative Exchange Rate</p>
+        <p className="indicative-value">
+          {result
+            ? `${result.amount} ${result.from} = ${result.convertedAmount.toFixed(2)} ${result.to}`
+            : `${amount || '0'} ${fromCurrency.currencyCode} = 0.00 ${toCurrency.currencyCode}`}
+        </p>
+      </section>
+
+      <footer className="converter-footer">
+        Zhe heng Y. @ {currentYear}
+      </footer>
     </div>
   );
 };

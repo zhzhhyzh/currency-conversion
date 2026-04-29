@@ -7,34 +7,6 @@ interface FlagIconProps {
   className?: string;
 }
 
-const CURRENCY_COUNTRY_MAP: { [key: string]: string } = {
-  USD: 'US',
-  EUR: 'EU', // European Union
-  GBP: 'GB',
-  JPY: 'JP',
-  AUD: 'AU',
-  CAD: 'CA',
-  CHF: 'CH',
-  CNY: 'CN',
-  INR: 'IN',
-  MXN: 'MX',
-  BRL: 'BR',
-  SGD: 'SG',
-  HKD: 'HK',
-  SEK: 'SE',
-  NZD: 'NZ',
-  MYR: 'MY',
-  ZAR: 'ZA',
-  THB: 'TH',
-  KRW: 'KR',
-  NOK: 'NO',
-  DKK: 'DK',
-  AED: 'AE',
-  SAR: 'SA',
-  QAR: 'QA',
-  TWD: 'TW',
-};
-
 const sizeClasses = {
   sm: 'flag-size-sm',
   md: 'flag-size-md',
@@ -46,14 +18,14 @@ export const FlagIcon: React.FC<FlagIconProps> = ({
   size = 'md', 
   className = '' 
 }) => {
-  const code = (CURRENCY_COUNTRY_MAP[countryCode.toUpperCase()] || countryCode).toUpperCase();
+  const code = countryCode.toUpperCase();
   
   const Flag = Flags[code as keyof typeof Flags] as React.ComponentType<{ className?: string }> | undefined;
 
   if (!Flag) {
     return (
       <div 
-        className={`${sizeClasses[size]} flag-fallback ${className}`}
+        className={`${sizeClasses[size]} flag-icon flag-fallback ${className}`}
       >
         {countryCode.substring(0, 2).toUpperCase()}
       </div>
@@ -61,9 +33,9 @@ export const FlagIcon: React.FC<FlagIconProps> = ({
   }
 
   return (
-    <Flag 
-      className={`${sizeClasses[size]} rounded shadow-sm ${className}`}
-    />
+    <span className={`${sizeClasses[size]} flag-icon flag-icon-circle ${className}`}>
+      <Flag className="flag-svg" />
+    </span>
   );
 };
 
