@@ -10,8 +10,8 @@ services:
     name: currency-api
     env: docker
     # Using root context '.' allows the builder to see the 'backend' folder
-    dockerContext: .
-    dockerfilePath: backend/Dockerfile 
+    dockerContext: ./backend
+    dockerfilePath: Dockerfile 
     plan: free
     envVars:
       - key: OPENEXCHANGERATES_API_KEY
@@ -27,8 +27,8 @@ services:
   - type: web
     name: currency-frontend
     env: docker
-    dockerContext: .
-    dockerfilePath: frontend/Dockerfile 
+    dockerContext: ./frontend
+    dockerfilePath: Dockerfile 
     plan: free
     # ADD THIS: This passes the backend address into the Docker BUILD step
     dockerBuildArgs:
