@@ -30,9 +30,13 @@ services:
     dockerContext: .
     dockerfilePath: frontend/Dockerfile 
     plan: free
-    envVars:
-      - key: REACT_APP_API_URL
+    # ADD THIS: This passes the backend address into the Docker BUILD step
+    dockerBuildArgs:
+      - arg: REACT_APP_API_URL
         fromService:
           type: web
           name: currency-api
           property: host
+    envVars:
+      - key: PORT
+        value: "3000"
