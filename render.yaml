@@ -14,17 +14,17 @@ services:
     plan: free
     envVars:
       - key: OPENEXCHANGERATES_API_KEY
-        sync: false # You will enter this value in the Dashboard
+        sync: false
       - key: REDIS_ENABLED
         value: "true"
-      # FIXED SYNTAX FOR REDIS HOST
       - key: REDIS_HOST
-        fromRedisName: currency-redis
-        property: host
-      # FIXED SYNTAX FOR REDIS PORT
+        fromRedis:
+          name: currency-redis
+          property: host
       - key: REDIS_PORT
-        fromRedisName: currency-redis
-        property: port
+        fromRedis:
+          name: currency-redis
+          property: port
 
   # 3. Frontend
   - type: web
@@ -34,7 +34,6 @@ services:
     dockerfilePath: Dockerfile
     plan: free
     envVars:
-      # FIXED SYNTAX FOR BACKEND HOST
       - key: REACT_APP_API_URL
         fromService:
           type: web
