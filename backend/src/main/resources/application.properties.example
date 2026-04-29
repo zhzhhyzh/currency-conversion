@@ -1,0 +1,35 @@
+# OpenExchangeRates API Configuration
+# Get your free API key from: https://openexchangerates.org/signup/free
+
+openexchangerates.api.key=your_api_key_here
+openexchangerates.api.url=https://openexchangerates.org/api/latest.json
+
+# Redis Configuration
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password=
+spring.data.redis.database=0
+spring.data.redis.timeout=2000
+redis.enabled=true
+
+# Optional. Keep false for on-demand cache fill:
+# first conversion fetches Open Exchange Rates, stores Redis, later conversions read Redis.
+exchange-rates.schedule.enabled=false
+
+# Server Configuration
+server.port=8080
+server.servlet.context-path=/
+
+# Application Configuration
+spring.application.name=currency-conversion-api
+
+# Logging Configuration
+logging.level.root=INFO
+logging.level.com.currency=DEBUG
+
+# Jackson Configuration (JSON Processing)
+spring.jackson.serialization.write-dates-as-timestamps=false
+spring.jackson.time-zone=UTC
+
+# Cache fallback
+# Redis is the primary cache. If Redis is unavailable, the app falls back to a short in-memory cache.

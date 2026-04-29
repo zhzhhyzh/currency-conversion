@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "Currency Conversion API",
+    "description": "REST API endpoints for Currency Conversion application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Check if API is running"
+      },
+      "response": []
+    },
+    {
+      "name": "Convert Currency",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=USD&to=EUR&amount=100",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD",
+              "description": "Source currency code (ISO 4217)"
+            },
+            {
+              "key": "to",
+              "value": "EUR",
+              "description": "Target currency code (ISO 4217)"
+            },
+            {
+              "key": "amount",
+              "value": "100",
+              "description": "Amount to convert (optional, default: 1.0)"
+            }
+          ]
+        },
+        "description": "Convert amount from one currency to another"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Exchange Rates",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/rates",
+          "host": ["{{base_url}}"],
+          "path": ["api", "rates"]
+        },
+        "description": "Get all latest exchange rates"
+      },
+      "response": []
+    },
+    {
+      "name": "Convert - USD to GBP",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=USD&to=GBP&amount=50",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD"
+            },
+            {
+              "key": "to",
+              "value": "GBP"
+            },
+            {
+              "key": "amount",
+              "value": "50"
+            }
+          ]
+        },
+        "description": "Convert 50 USD to GBP"
+      },
+      "response": []
+    },
+    {
+      "name": "Convert - EUR to JPY",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=EUR&to=JPY&amount=100",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "EUR"
+            },
+            {
+              "key": "to",
+              "value": "JPY"
+            },
+            {
+              "key": "amount",
+              "value": "100"
+            }
+          ]
+        },
+        "description": "Convert 100 EUR to JPY"
+      },
+      "response": []
+    },
+    {
+      "name": "Error - Invalid Currency",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=INVALID&to=EUR&amount=100",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "INVALID"
+            },
+            {
+              "key": "to",
+              "value": "EUR"
+            },
+            {
+              "key": "amount",
+              "value": "100"
+            }
+          ]
+        },
+        "description": "Test error handling for invalid currency code"
+      },
+      "response": []
+    },
+    {
+      "name": "Error - Negative Amount",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=USD&to=EUR&amount=-100",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD"
+            },
+            {
+              "key": "to",
+              "value": "EUR"
+            },
+            {
+              "key": "amount",
+              "value": "-100"
+            }
+          ]
+        },
+        "description": "Test error handling for negative amount"
+      },
+      "response": []
+    },
+    {
+      "name": "Error - Missing Parameters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=USD",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD"
+            }
+          ]
+        },
+        "description": "Test error handling for missing required parameters"
+      },
+      "response": []
+    },
+    {
+      "name": "Convert - Same Currency",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/convert?from=USD&to=USD&amount=100",
+          "host": ["{{base_url}}"],
+          "path": ["api", "convert"],
+          "query": [
+            {
+              "key": "from",
+              "value": "USD"
+            },
+            {
+              "key": "to",
+              "value": "USD"
+            },
+            {
+              "key": "amount",
+              "value": "100"
+            }
+          ]
+        },
+        "description": "Convert same currency (should return 1:1)"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
