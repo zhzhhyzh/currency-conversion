@@ -18,6 +18,22 @@ const formatNumber = (value: number, maximumFractionDigits = 6) => (
 
 const formatInputAmount = (value: number) => value.toFixed(2);
 
+const getIndicativeText = (result: ConversionResponse | null, fromCode: string, toCode: string) => {
+  if (!result) {
+    return `1 ${fromCode} = 0 ${toCode}`;
+  }
+
+  let baseAmount = 1;
+  let convertedRate = result.rate;
+
+  while (convertedRate > 0 && convertedRate < 0.01) {
+    baseAmount *= 100;
+    convertedRate *= 100;
+  }
+
+  return `${formatNumber(baseAmount, 0)} ${result.from} = ${formatNumber(convertedRate, 4)} ${result.to}`;
+};
+
 const currentYear = new Date().getFullYear();
 
 export const CurrencyConverter: React.FC = () => {
@@ -94,9 +110,7 @@ export const CurrencyConverter: React.FC = () => {
     setAmount(value);
   };
 
-  const indicativeText = result
-    ? `1 ${result.from} = ${formatNumber(result.rate, 4)} ${result.to}`
-    : `1 ${fromCurrency.currencyCode} = 0 ${toCurrency.currencyCode}`;
+  const indicativeText = getIndicativeText(result, fromCurrency.currencyCode, toCurrency.currencyCode);
 
   return (
     <div className="converter-container">
