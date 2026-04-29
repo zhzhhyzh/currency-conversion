@@ -17,14 +17,11 @@ services:
         sync: false
       - key: REDIS_ENABLED
         value: "true"
+      # Using the standard internal naming convention
       - key: REDIS_HOST
-        fromRedis:
-          name: currency-redis
-          property: host
+        value: currency-redis
       - key: REDIS_PORT
-        fromRedis:
-          name: currency-redis
-          property: port
+        value: "6379"
 
   # 3. Frontend
   - type: web
