@@ -1,11 +1,11 @@
 services:
-  # Redis - Using Render's managed Redis
+  # 1. Redis
   - type: redis
     name: currency-redis
     plan: free
-    ipAllowList: [] # Internal access only for security
+    ipAllowList: []
 
-  # Backend API
+  # 2. Backend
   - type: web
     name: currency-api
     env: docker
@@ -13,18 +13,20 @@ services:
     dockerfilePath: Dockerfile
     plan: free
     envVars:
+      - key: OPENEXCHANGERATES_API_KEY
+        sync: false # You will enter this value in the Dashboard
       - key: REDIS_ENABLED
         value: "true"
+      # FIXED SYNTAX FOR REDIS HOST
       - key: REDIS_HOST
         fromRedisName: currency-redis
         property: host
+      # FIXED SYNTAX FOR REDIS PORT
       - key: REDIS_PORT
         fromRedisName: currency-redis
         property: port
-      - key: OPENEXCHANGERATES_API_KEY
-        sync: false # You will manually paste this in the dashboard
 
-  # Frontend Web
+  # 3. Frontend
   - type: web
     name: currency-frontend
     env: docker
@@ -32,6 +34,7 @@ services:
     dockerfilePath: Dockerfile
     plan: free
     envVars:
+      # FIXED SYNTAX FOR BACKEND HOST
       - key: REACT_APP_API_URL
         fromService:
           type: web
