@@ -73,7 +73,7 @@ failsafe-reports/
 docker-compose.override.yml
 *.pid
 redis-data/
-data/
+/data/
 
 # Temporary files
 tmp/
