@@ -33,4 +33,4 @@ services:
     dockerContext: ./frontend
     envVars:
       - key: REACT_APP_API_URL
-        value: https://currency-api.onrender.com/api
+        value: https://currency-api-9wye.onrender.com/api
