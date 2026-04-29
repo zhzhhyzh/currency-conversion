@@ -9,6 +9,15 @@ const getCurrencyOption = (optionId: string) => (
   CURRENCY_OPTIONS.find((option) => option.id === optionId) || CURRENCY_OPTIONS[0]
 );
 
+const formatNumber = (value: number, maximumFractionDigits = 6) => (
+  new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits,
+  }).format(value)
+);
+
+const formatInputAmount = (value: number) => value.toFixed(2);
+
 const currentYear = new Date().getFullYear();
 
 export const CurrencyConverter: React.FC = () => {
@@ -66,9 +75,28 @@ export const CurrencyConverter: React.FC = () => {
   }, [amount, fromCurrency.currencyCode, toCurrency.currencyCode]);
 
   const handleSwapCurrencies = () => {
+    if (result) {
+      setAmount(formatInputAmount(result.convertedAmount));
+    }
     setFromCurrencyId(toCurrencyId);
     setToCurrencyId(fromCurrencyId);
   };
+
+  const handleFromCurrencyChange = (optionId: string) => {
+    setFromCurrencyId(optionId);
+  };
+
+  const handleToCurrencyChange = (optionId: string) => {
+    setToCurrencyId(optionId);
+  };
+
+  const handleAmountChange = (value: string) => {
+    setAmount(value);
+  };
+
+  const indicativeText = result
+    ? `1 ${result.from} = ${formatNumber(result.rate, 4)} ${result.to}`
+    : `1 ${fromCurrency.currencyCode} = 0 ${toCurrency.currencyCode}`;
 
   return (
     <div className="converter-container">
@@ -89,12 +117,12 @@ export const CurrencyConverter: React.FC = () => {
               <CurrencySearchSelect
                 id="from-currency"
                 selectedId={fromCurrencyId}
-                onChange={setFromCurrencyId}
+                onChange={handleFromCurrencyChange}
               />
               <input
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => handleAmountChange(e.target.value)}
                 className="amount-input"
                 placeholder="0.00"
                 min="0"
@@ -123,7 +151,7 @@ export const CurrencyConverter: React.FC = () => {
               <CurrencySearchSelect
                 id="to-currency"
                 selectedId={toCurrencyId}
-                onChange={setToCurrencyId}
+                onChange={handleToCurrencyChange}
               />
               <div className="result-display">
                 {result ? result.convertedAmount.toFixed(2) : '0.00'}
@@ -137,11 +165,7 @@ export const CurrencyConverter: React.FC = () => {
 
       <section className="indicative-rate">
         <p className="indicative-label">Indicative Exchange Rate</p>
-        <p className="indicative-value">
-          {result
-            ? `${result.amount} ${result.from} = ${result.convertedAmount.toFixed(2)} ${result.to}`
-            : `${amount || '0'} ${fromCurrency.currencyCode} = 0.00 ${toCurrency.currencyCode}`}
-        </p>
+        <p className="indicative-value">{indicativeText}</p>
       </section>
 
       <footer className="converter-footer">

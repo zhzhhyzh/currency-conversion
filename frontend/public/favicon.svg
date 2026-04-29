@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ZH">
+  <rect width="64" height="64" rx="14" fill="#eaf6ff"/>
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="#ffffff"/>
+  <text
+    x="32"
+    y="40"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="27"
+    font-weight="900"
+    letter-spacing="-1"
+    fill="#102f6e"
+  >ZH</text>
+</svg>
