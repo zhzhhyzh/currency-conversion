@@ -7,10 +7,13 @@ services:
   # 2. Backend
   - type: web
     name: currency-api
-    runtime: docker
-    # rootDir tells Render to "cd" into this folder before doing anything
+    # FIX: Changed 'runtime' to 'env' for Docker services
+    env: docker
+    # rootDir changes the 'starting point' to the backend folder
     rootDir: backend
+    # Relative to rootDir (so this looks for backend/Dockerfile)
     dockerfilePath: Dockerfile 
+    # Relative to rootDir (so this uses the backend folder as context)
     dockerContext: .
     plan: free
     envVars:
@@ -24,7 +27,7 @@ services:
   # 3. Frontend
   - type: web
     name: currency-frontend
-    runtime: docker
+    env: docker
     rootDir: frontend
     dockerfilePath: Dockerfile
     dockerContext: .
