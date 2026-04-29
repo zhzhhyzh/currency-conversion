@@ -1,5 +1,6 @@
 package com.currency.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,8 @@ public class ExchangeRateData {
     private Map<String, Double> rates;
     private LocalDateTime timestamp;
     private long cacheExpiryTime;
-    
+
+    @JsonIgnore
     public boolean isExpired() {
         return System.currentTimeMillis() > cacheExpiryTime;
     }

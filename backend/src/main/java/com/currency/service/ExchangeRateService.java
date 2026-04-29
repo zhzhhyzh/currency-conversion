@@ -69,6 +69,9 @@ public class ExchangeRateService {
         // Fallback to in-memory cache
         ExchangeRateData cachedData = cacheManager.get(cacheKey);
         if (cachedData != null) {
+            if (redisEnabled) {
+                cacheRedisFromMemory(cacheKey, cachedData);
+            }
             log.info("Returning cached exchange rates from memory");
             return cachedData;
         }
@@ -83,11 +86,12 @@ public class ExchangeRateService {
             }
 
             ExchangeRateData data = parseExchangeRateResponse(response);
+            long ttl = cutoffTimeManager.getCacheTTL(data.getRates().keySet());
+            data.setCacheExpiryTime(System.currentTimeMillis() + (Math.max(ttl, 60) * 1000));
             
             // Cache in both Redis and memory
             if (redisEnabled) {
                 try {
-                    long ttl = cutoffTimeManager.getCacheTTL(data.getRates().keySet());
                     if (redisCacheService.set(cacheKey, data, ttl)) {
                         log.info("Stored latest exchange rates in Redis with TTL: {} seconds", ttl);
                     }
@@ -96,7 +100,7 @@ public class ExchangeRateService {
                 }
             }
             
-            cacheManager.put(cacheKey, data, cutoffTimeManager.getCacheTTL(data.getRates().keySet()));
+            cacheManager.put(cacheKey, data, ttl);
             
             return data;
         } catch (RestClientException e) {
@@ -106,6 +110,22 @@ public class ExchangeRateService {
             log.error("Error processing exchange rates: ", e);
             throw new CurrencyException("Error processing exchange rates: " + e.getMessage(), 500, e);
         }
+    }
+
+    private void cacheRedisFromMemory(String cacheKey, ExchangeRateData data) {
+        try {
+            long ttl = getRemainingTtlSeconds(data);
+            if (ttl > 0 && redisCacheService.set(cacheKey, data, ttl)) {
+                log.info("Rehydrated Redis exchange rates cache from memory with TTL: {} seconds", ttl);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to rehydrate Redis cache from memory: ", e);
+        }
+    }
+
+    private long getRemainingTtlSeconds(ExchangeRateData data) {
+        long remainingMillis = data.getCacheExpiryTime() - System.currentTimeMillis();
+        return Math.max(remainingMillis / 1000, 0);
     }
 
     private ExchangeRateData parseExchangeRateResponse(String response) throws Exception {
