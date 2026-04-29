@@ -18,12 +18,15 @@ public class CurrencyConversionService {
     }
 
     public ConversionResponseDto convert(String fromCurrency, String toCurrency, double amount) {
-        if (!isValidCurrencyCode(fromCurrency)) {
-            throw new CurrencyException("Invalid source currency: " + fromCurrency, 400);
+        String normalizedFromCurrency = normalizeCurrencyCode(fromCurrency);
+        String normalizedToCurrency = normalizeCurrencyCode(toCurrency);
+
+        if (!isValidCurrencyCode(normalizedFromCurrency)) {
+            throw new CurrencyException("Source currency must be a 3-letter ISO currency code", 400);
         }
 
-        if (!isValidCurrencyCode(toCurrency)) {
-            throw new CurrencyException("Invalid target currency: " + toCurrency, 400);
+        if (!isValidCurrencyCode(normalizedToCurrency)) {
+            throw new CurrencyException("Target currency must be a 3-letter ISO currency code", 400);
         }
 
         if (!Double.isFinite(amount)) {
@@ -36,20 +39,20 @@ public class CurrencyConversionService {
 
         if (amount == 0) {
             log.warn("Zero amount conversion requested");
-            return createConversionResponse(fromCurrency, toCurrency, amount, 0, 0);
+            return createConversionResponse(normalizedFromCurrency, normalizedToCurrency, amount, 0, 0);
         }
 
-        if (fromCurrency.equalsIgnoreCase(toCurrency)) {
-            return createConversionResponse(fromCurrency, toCurrency, amount, amount, 1.0);
+        if (normalizedFromCurrency.equals(normalizedToCurrency)) {
+            return createConversionResponse(normalizedFromCurrency, normalizedToCurrency, amount, amount, 1.0);
         }
 
         try {
             ExchangeRateData rateData = exchangeRateService.getLatestRates();
-            double rate = calculateExchangeRate(fromCurrency, toCurrency, rateData);
+            double rate = calculateExchangeRate(normalizedFromCurrency, normalizedToCurrency, rateData);
             double convertedAmount = amount * rate;
 
-            log.info("Converted {} {} to {} {} at rate {}", amount, fromCurrency, convertedAmount, toCurrency, rate);
-            return createConversionResponse(fromCurrency, toCurrency, amount, convertedAmount, rate);
+            log.info("Converted {} {} to {} {} at rate {}", amount, normalizedFromCurrency, convertedAmount, normalizedToCurrency, rate);
+            return createConversionResponse(normalizedFromCurrency, normalizedToCurrency, amount, convertedAmount, rate);
         } catch (CurrencyException e) {
             throw e;
         } catch (Exception e) {
@@ -90,10 +93,11 @@ public class CurrencyConversionService {
     }
 
     private boolean isValidCurrencyCode(String code) {
-        if (code == null || code.trim().isEmpty()) {
-            return false;
-        }
-        return code.matches("^[A-Z]{3}$");
+        return code != null && code.matches("^[A-Z]{3}$");
+    }
+
+    private String normalizeCurrencyCode(String code) {
+        return code == null ? null : code.trim().toUpperCase();
     }
 
     private ConversionResponseDto createConversionResponse(String from, String to, double amount, 

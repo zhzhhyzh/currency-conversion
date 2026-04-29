@@ -129,14 +129,15 @@ Backend:
 
 ```bash
 cd backend
-mvn test
+mvn clean verify
 ```
 
 Verified result:
 
 ```text
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
+Line coverage: 83.61%
 ```
 
 Frontend:

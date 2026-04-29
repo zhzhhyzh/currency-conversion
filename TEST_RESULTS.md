@@ -7,14 +7,22 @@ Test date: April 29, 2026
 Command:
 
 ```powershell
-& 'C:\Users\henry\.m2\wrapper\dists\apache-maven-3.9.11-bin\6mqf5t809d9geo83kj4ttckcbc\apache-maven-3.9.11\bin\mvn.cmd' clean package
+& 'C:\Users\henry\.m2\wrapper\dists\apache-maven-3.9.11-bin\6mqf5t809d9geo83kj4ttckcbc\apache-maven-3.9.11\bin\mvn.cmd' clean verify
 ```
 
 Result:
 
 ```text
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
+```
+
+JaCoCo coverage:
+
+```text
+Line coverage: 83.61% (352 covered, 69 missed)
+Coverage gate: 80% minimum line coverage
+Report: backend/target/site/jacoco/index.html
 ```
 
 Java 8 bytecode check:
@@ -32,11 +40,16 @@ Currency Conversion API is running
 
 Covered cases:
 
-- USD to EUR conversion returns a positive converted amount.
-- Zero amount returns zero.
-- Same-currency conversion returns a 1:1 rate.
-- Negative amount throws `CurrencyException`.
-- Invalid currency code throws `CurrencyException`.
+- Base, reverse, and cross-currency conversion formulas.
+- Lowercase and padded currency code normalization.
+- Zero amount and same-currency conversion.
+- Negative, non-finite, invalid source, and invalid target amount/currency errors.
+- Missing source/target exchange rates and invalid zero exchange-rate values.
+- `/api/convert`, `/api/rates`, `/api/health`, and `/api/cache/*` controller responses.
+- Readable JSON errors for missing query parameters, invalid amount values, domain exceptions, and unexpected exceptions.
+- Redis cache get/set/delete/TTL/health behavior, including failure fallbacks.
+- In-memory cache expiration and clearing.
+- GMT+8 cutoff time and TTL calculation behavior.
 - Scheduled exchange-rate refresh is disabled by default, so the first external API fetch is demand-driven by `/api/convert` or `/api/rates`.
 
 ## Frontend Build

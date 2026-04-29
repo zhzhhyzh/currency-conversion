@@ -111,6 +111,8 @@ public class ExchangeRateService {
             cacheManager.put(cacheKey, data, ttl);
             
             return data;
+        } catch (CurrencyException e) {
+            throw e;
         } catch (RestClientException e) {
             log.error("Error fetching exchange rates from API: ", e);
             throw new CurrencyException("Unable to fetch exchange rates from API: " + e.getMessage(), 503, e);
