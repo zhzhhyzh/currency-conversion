@@ -1,235 +1,255 @@
 {
   "info": {
-    "name": "Currency Conversion API",
-    "description": "REST API endpoints for Currency Conversion application",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "_postman_id": "6ac3f209-1afd-44f5-b33d-f54e7ca8749e",
+    "name": "CurrencyConversion",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "45658930",
+    "_collection_link": "https://go.postman.co/collection/45658930-6ac3f209-1afd-44f5-b33d-f54e7ca8749e?source=collection_link"
   },
   "item": [
     {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/health",
-          "host": ["{{base_url}}"],
-          "path": ["api", "health"]
-        },
-        "description": "Check if API is running"
-      },
-      "response": []
-    },
-    {
-      "name": "Convert Currency",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=USD&to=EUR&amount=100",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "USD",
-              "description": "Source currency code (ISO 4217)"
+      "name": "Offline",
+      "item": [
+        {
+          "name": "OpenRateExchange",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            {
-              "key": "to",
-              "value": "EUR",
-              "description": "Target currency code (ISO 4217)"
-            },
-            {
-              "key": "amount",
-              "value": "100",
-              "description": "Amount to convert (optional, default: 1.0)"
+            "url": {
+              "raw": "https://openexchangerates.org/api/latest.json?app_id=14563116fd894394ad55235487f4b92e",
+              "protocol": "https",
+              "host": [
+                "openexchangerates",
+                "org"
+              ],
+              "path": [
+                "api",
+                "latest.json"
+              ],
+              "query": [
+                {
+                  "key": "app_id",
+                  "value": "14563116fd894394ad55235487f4b92e"
+                }
+              ]
             }
-          ]
+          },
+          "response": []
         },
-        "description": "Convert amount from one currency to another"
-      },
-      "response": []
-    },
-    {
-      "name": "Get Exchange Rates",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/rates",
-          "host": ["{{base_url}}"],
-          "path": ["api", "rates"]
-        },
-        "description": "Get all latest exchange rates"
-      },
-      "response": []
-    },
-    {
-      "name": "Convert - USD to GBP",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=USD&to=GBP&amount=50",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "USD"
+        {
+          "name": "Convert (Local)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"app_id\":\"14563116fd894394ad55235487f4b92e\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            {
-              "key": "to",
-              "value": "GBP"
-            },
-            {
-              "key": "amount",
-              "value": "50"
+            "url": {
+              "raw": "http://localhost:8081/api/convert?from=USD&to=MYR&amount=200",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "convert"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "USD"
+                },
+                {
+                  "key": "to",
+                  "value": "MYR"
+                },
+                {
+                  "key": "amount",
+                  "value": "200"
+                }
+              ]
             }
-          ]
+          },
+          "response": []
         },
-        "description": "Convert 50 USD to GBP"
-      },
-      "response": []
+        {
+          "name": "Rate (Local)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"app_id\":\"14563116fd894394ad55235487f4b92e\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/rates",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8081",
+              "path": [
+                "api",
+                "rates"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     },
     {
-      "name": "Convert - EUR to JPY",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=EUR&to=JPY&amount=100",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "EUR"
+      "name": "Online",
+      "item": [
+        {
+          "name": "OpenRateExchange",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            {
-              "key": "to",
-              "value": "JPY"
-            },
-            {
-              "key": "amount",
-              "value": "100"
+            "url": {
+              "raw": "https://openexchangerates.org/api/latest.json?app_id=14563116fd894394ad55235487f4b92e",
+              "protocol": "https",
+              "host": [
+                "openexchangerates",
+                "org"
+              ],
+              "path": [
+                "api",
+                "latest.json"
+              ],
+              "query": [
+                {
+                  "key": "app_id",
+                  "value": "14563116fd894394ad55235487f4b92e"
+                }
+              ]
             }
-          ]
+          },
+          "response": []
         },
-        "description": "Convert 100 EUR to JPY"
-      },
-      "response": []
-    },
-    {
-      "name": "Error - Invalid Currency",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=INVALID&to=EUR&amount=100",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "INVALID"
+        {
+          "name": "Convert (Local)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"app_id\":\"14563116fd894394ad55235487f4b92e\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            {
-              "key": "to",
-              "value": "EUR"
-            },
-            {
-              "key": "amount",
-              "value": "100"
+            "url": {
+              "raw": "https://currency-api-9wye.onrender.com/api/convert?from=USD&to=MYR&amount=200",
+              "protocol": "https",
+              "host": [
+                "currency-api-9wye",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "convert"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "USD"
+                },
+                {
+                  "key": "to",
+                  "value": "MYR"
+                },
+                {
+                  "key": "amount",
+                  "value": "200"
+                }
+              ]
             }
-          ]
+          },
+          "response": []
         },
-        "description": "Test error handling for invalid currency code"
-      },
-      "response": []
-    },
-    {
-      "name": "Error - Negative Amount",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=USD&to=EUR&amount=-100",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "USD"
+        {
+          "name": "Rate (Local)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"app_id\":\"14563116fd894394ad55235487f4b92e\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
-            {
-              "key": "to",
-              "value": "EUR"
-            },
-            {
-              "key": "amount",
-              "value": "-100"
+            "url": {
+              "raw": "https://currency-api-9wye.onrender.com/api/rates",
+              "protocol": "https",
+              "host": [
+                "currency-api-9wye",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "rates"
+              ]
             }
-          ]
-        },
-        "description": "Test error handling for negative amount"
-      },
-      "response": []
-    },
-    {
-      "name": "Error - Missing Parameters",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=USD",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "USD"
-            }
-          ]
-        },
-        "description": "Test error handling for missing required parameters"
-      },
-      "response": []
-    },
-    {
-      "name": "Convert - Same Currency",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/api/convert?from=USD&to=USD&amount=100",
-          "host": ["{{base_url}}"],
-          "path": ["api", "convert"],
-          "query": [
-            {
-              "key": "from",
-              "value": "USD"
-            },
-            {
-              "key": "to",
-              "value": "USD"
-            },
-            {
-              "key": "amount",
-              "value": "100"
-            }
-          ]
-        },
-        "description": "Convert same currency (should return 1:1)"
-      },
-      "response": []
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8080",
-      "type": "string"
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

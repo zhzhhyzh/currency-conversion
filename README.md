@@ -12,21 +12,12 @@ Full-stack currency converter using Spring Boot, React, TypeScript, Redis, Docke
 - In-memory fallback cache when Redis is unavailable
 - React TypeScript frontend with lightweight SVG flags from `country-flag-icons`
 - Docker Compose setup for frontend, backend, and Redis
-- Render Blueprint deployment for frontend, backend, and Redis-compatible Key Value service
 - Backend unit tests
 
 ## Requirements
 
 - Docker and Docker Compose
 - Free Open Exchange Rates API key from [openexchangerates.org](https://openexchangerates.org/signup/free)
-
-## Live Deployment
-
-- Frontend: https://currency-frontend-3mdz.onrender.com
-- Backend: https://currency-api-9wye.onrender.com
-- Backend health check: https://currency-api-9wye.onrender.com/api/health
-- Example live conversion: https://currency-api-9wye.onrender.com/api/convert?from=USD&to=EUR&amount=100
-- Render Redis service ID: `red-d7otnspf9bms73fg3qng`
 
 ## Configuration
 
@@ -45,8 +36,7 @@ redis.enabled=true
 exchange-rates.schedule.enabled=false
 ```
 
-Docker Compose runs the frontend with `REACT_APP_API_URL=http://localhost:8081/api`.
-Render runs the frontend with `REACT_APP_API_URL=https://currency-api-9wye.onrender.com/api`.
+Docker Compose builds the frontend with `REACT_APP_API_URL=http://localhost:8081/api`.
 
 ## Run With Docker
 
@@ -115,14 +105,31 @@ Calling `/api/rates` always fetches the latest payload from Open Exchange Rates 
 
 Cutoff table:
 
-| Time GMT+8 | Currency codes |
-| --- | --- |
-| 11:00 | JPY, NZD |
-| 12:00 | AUD, PHP |
-| 15:00 | BND, CNY, HKD, IDR, SGD, THB |
-| 16:00 | AED, BDT, CAD, CHF, DKK, EUR, GBP, INR, LKR, NOK, PKR, SAR, SEK, USD, ZAR |
 
-Any currency not listed uses the default 16:00 GMT+8 cutoff.
+| Time GMT+8 | Currency codes                                                            |
+| ---------- | ------------------------------------------------------------------------- |
+| 11:00      | JPY, NZD                                                                  |
+| 12:00      | AUD, PHP                                                                  |
+| 15:00      | BND, CNY, HKD, IDR, SGD, THB                                              |
+| 16:00      | AED, BDT, CAD, CHF, DKK, EUR, GBP, INR, LKR, NOK, PKR, SAR, SEK, USD, ZAR |
+
+To align with the daily currency updates for the USD and other major markets, the system cache is scheduled for release at the **16:00 (GMT+8)** cutoff. This ensures all exchange rate data remains synchronized and accurate.Based on most of the currency is refreshed and updated by 16:00 GMT+8 AND USD exchange rate refresh time is on same time, therefore the cache will planned to be released on 16:00 GMT+8 cutoff.
+
+
+
+## Usage of AI
+
+I have structured my end-to-end development process into a highly efficient workflow by integrating AI as a strategic collaborator at every phase of the project lifecycle.
+
+During the **planning phase**, I utilize AI to ingest technical documentation and distill it into actionable checklists. This ensures that critical requirements are captured early, such as defining specific API endpoints like `/convert` and `/rates` and establishing the integration parameters for external services like the OpenExchange `/latest.json` endpoint. The AI planned documents can refer to `plan.md` for more information.
+
+In the **system design** stage, I consult with AI to validate my architectural choices, specifically ensuring that the separation of concerns between the frontend and backend adheres strictly to the MVC pattern. We also verify the project structure and Maven configurations to eliminate potential environment errors and dependency conflicts before any heavy lifting begins.
+
+For **code implementation**, my workflow involves writing the primary logic and then leveraging AI to standardize and enhance the codebase. The focus here is on applying professional software principles—prioritizing high readability, maintainability, and the technical balance of low coupling and high cohesion to ensure the system is scalable.
+
+The **testing phase** is a hybrid approach where I personally evaluate the frontend for user-friendliness and functional flow, while using AI to bolster the backend's resilience. I task the AI with generating comprehensive JUnit and JaCoCo test suites, specifically focusing on identifying and testing edge cases that ensure the program operates correctly under various stress conditions.
+
+Finally, in the **deployment** stage, I am implementing a Docker-based strategy on Render using a blueprint configuration. To bridge the gap between my local machine and production, I am currently working with AI to refactor my backend and frontend Dockerfiles, ensuring they are fully compatible across both environments for a seamless CI/CD experience.
 
 ## Conversion Formula
 
@@ -145,9 +152,9 @@ mvn clean verify
 Verified result:
 
 ```text
-Tests run: 59, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
-Line coverage: 87.89%
+Line coverage: 83.61%
 ```
 
 Frontend:
@@ -164,26 +171,6 @@ Compiled successfully.
 ```
 
 See `TEST_RESULTS.md` for the exact local commands and notes.
-
-Docker image verification:
-
-```text
-docker compose config --quiet
-docker compose build backend frontend
-Service backend  Built
-Service frontend  Built
-```
-
-## AI Assistance
-
-OpenAI was used as a development assistant throughout the project. The major prompts and workflows were:
-
-- Planning: asked OpenAI to create `plan.md` for the Currency Conversion assignment, including backend, frontend, Redis caching, Docker, tests, and deployment tasks.
-- System analysis and design: asked OpenAI to review the assignment requirements and map them to a Spring Boot MVC backend, React TypeScript frontend, Redis cache strategy, Open Exchange Rates integration, and Render deployment setup.
-- Code implementation: prompted OpenAI to help implement the custom `/api/convert` calculation, `/api/rates` refresh behavior, Redis cache lookup before external API calls, cutoff-time TTL logic, readable API errors, and frontend dynamic conversion with `useEffect`.
-- UI implementation: prompted OpenAI to refine the frontend to match the provided currency converter design, including light blue/white styling, searchable currency dropdowns, circular flags from `country-flag-icons`, swap control, indicative exchange rate text, and footer credit.
-- Testing: prompted OpenAI to add JUnit tests for controller, service, Redis cache, cutoff TTL, readable error handling, and Render Redis URL configuration, with a JaCoCo coverage gate.
-- Docker and deployment: prompted OpenAI to configure local Docker Compose and Render Blueprint deployment for the backend, frontend, and Redis-compatible Render Key Value service, including runtime frontend API configuration.
 
 ## Project Structure
 
