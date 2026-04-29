@@ -13,14 +13,14 @@ Command:
 Result:
 
 ```text
-Tests run: 55, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 59, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
 JaCoCo coverage:
 
 ```text
-Line coverage: 83.61% (352 covered, 69 missed)
+Line coverage: 87.89% (399 covered, 55 missed)
 Coverage gate: 80% minimum line coverage
 Report: backend/target/site/jacoco/index.html
 ```
@@ -38,6 +38,16 @@ GET http://localhost:8081/api/health
 Currency Conversion API is running
 ```
 
+Live Render smoke checks:
+
+```text
+GET https://currency-api-9wye.onrender.com/api/health
+Currency Conversion API is running
+
+GET https://currency-api-9wye.onrender.com/api/convert?from=USD&to=EUR&amount=100
+200 OK with from=USD, to=EUR, amount=100.0, and a calculated convertedAmount
+```
+
 Covered cases:
 
 - Base, reverse, and cross-currency conversion formulas.
@@ -48,6 +58,7 @@ Covered cases:
 - `/api/convert`, `/api/rates`, `/api/health`, and `/api/cache/*` controller responses.
 - Readable JSON errors for missing query parameters, invalid amount values, domain exceptions, and unexpected exceptions.
 - Redis cache get/set/delete/TTL/health behavior, including failure fallbacks.
+- Render Redis `REDIS_URL` connection string parsing and fallback behavior.
 - In-memory cache expiration and clearing.
 - GMT+8 cutoff time and TTL calculation behavior.
 - Scheduled exchange-rate refresh is disabled by default, so the first external API fetch is demand-driven by `/api/convert` or `/api/rates`.
@@ -74,9 +85,41 @@ Production bundle output:
 1.38 kB    build\static\css\main.ae17dad8.css
 ```
 
+## Docker And Compose Checks
+
+Docker Compose syntax:
+
+```powershell
+docker compose config --quiet
+```
+
+Result:
+
+```text
+Passed
+```
+
+Docker image build command attempted:
+
+```powershell
+docker compose build backend frontend
+```
+
+Result:
+
+```text
+Service backend  Built
+Service frontend  Built
+```
+
+The backend and frontend Docker images build successfully from the same Dockerfiles used by Docker Compose and Render.
+
 ## Notes
 
 - Maven is not on the global PATH in this workstation, so tests were run using the Maven distribution already present under `C:\Users\henry\.m2\wrapper\dists`.
 - The backend targets Java 1.8 and the compiled application entry point verifies as class major version 52.
 - Frontend dependencies install with `country-flag-icons@1.6.16`, the current published npm version available during verification.
 - Local server smoke check passed on `http://localhost:8081/api/health` because port 8080 is already occupied by an Oracle listener on this workstation.
+- Live frontend: `https://currency-frontend-3mdz.onrender.com`
+- Live backend: `https://currency-api-9wye.onrender.com`
+- Render Redis service ID: `red-d7otnspf9bms73fg3qng`
